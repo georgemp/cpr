@@ -11,8 +11,8 @@
 using namespace cpr;
 
 static Server* server = new Server();
-auto base = server->GetBaseUrl();
-auto baseSSL = server->GetBaseUrlSSL();
+auto base = server -> GetBaseUrl();
+auto baseSSL = server -> GetBaseUrlSSL();
 
 TEST(ErrorTests, BasicSSLFailure) {
     auto url = Url{baseSSL + "/hello.html"};
@@ -21,11 +21,10 @@ TEST(ErrorTests, BasicSSLFailure) {
     EXPECT_EQ(0, response.status_code);
     auto curl_version = curl_version_info(CURLVERSION_NOW);
     auto expected = ErrorCode::UNSUPPORTED_PROTOCOL;
-    if(curl_version->features & CURL_VERSION_SSL) {
+    if (curl_version->features & CURL_VERSION_SSL) {
         expected = ErrorCode::SSL_CONNECT_ERROR;
     }
     EXPECT_EQ(expected, response.error.code);
-
 }
 
 TEST(ErrorTests, UnsupportedProtocolFailure) {
@@ -87,6 +86,14 @@ TEST(ErrorTests, BoolTrueTest) {
     Error error;
     error.code = ErrorCode::UNSUPPORTED_PROTOCOL;
     EXPECT_TRUE(error);
+}
+
+TEST(ErrorTests, StdErrorCodeHookTest) {
+    std::error_code errCode = make_error_code(ErrorCode::CONNECTION_FAILURE);
+    EXPECT_EQ(errCode.value(), static_cast<int>(ErrorCode::CONNECTION_FAILURE));
+    EXPECT_STREQ("cprErrorCode", errCode.category().name());
+    EXPECT_STREQ("connection failure", errCode.message().c_str());
+    EXPECT_EQ(std::errc::not_connected, errCode.default_error_condition());
 }
 
 int main(int argc, char** argv) {
