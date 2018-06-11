@@ -89,7 +89,7 @@ TEST(ErrorTests, BoolTrueTest) {
 }
 
 TEST(ErrorTests, StdErrorCodeHookTest) {
-    std::error_code errCode = make_error_code(ErrorCode::CONNECTION_FAILURE);
+    std::error_code errCode = ErrorCode::CONNECTION_FAILURE;
     EXPECT_EQ(errCode.value(), static_cast<int>(ErrorCode::CONNECTION_FAILURE));
     EXPECT_STREQ("cprErrorCode", errCode.category().name());
     EXPECT_STREQ("connection failure", errCode.message().c_str());
