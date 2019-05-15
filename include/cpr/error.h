@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <system_error>
 
 #include "cpr/cprtypes.h"
 #include "cpr/defines.h"
@@ -47,6 +48,34 @@ class Error {
   private:
     static ErrorCode getErrorCodeForCurlError(std::int32_t curl_code);
 };
+
+
+} // namespace cpr
+
+namespace std {
+template <>
+struct is_error_code_enum<cpr::ErrorCode> : std::true_type {};
+} // namespace std
+
+namespace detail {
+class ErrorCode_category : public std::error_category {
+  public:
+    virtual const char* name() const noexcept override final;
+    virtual std::string message(int c) const override final;
+    virtual std::error_condition default_error_condition(int c) const noexcept override final;
+};
+} // namespace detail
+
+namespace cpr {
+#define ERRORCODE_API_DECL extern inline
+ERRORCODE_API_DECL const detail::ErrorCode_category& ErrorCode_category() {
+    static detail::ErrorCode_category c;
+    return c;
+}
+
+inline std::error_code make_error_code(cpr::ErrorCode e) {
+    return {static_cast<int>(e), ErrorCode_category()};
+}
 
 } // namespace cpr
 

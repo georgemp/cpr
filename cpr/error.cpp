@@ -1,4 +1,5 @@
 #include "cpr/error.h"
+#include <string>
 
 #include <curl/curl.h>
 
@@ -67,3 +68,85 @@ ErrorCode Error::getErrorCodeForCurlError(std::int32_t curl_code) {
 }
 
 } // namespace cpr
+
+namespace detail {
+const char* ErrorCode_category::name() const noexcept {
+    return "cprErrorCode";
+}
+
+std::string ErrorCode_category::message(int c) const {
+    switch (static_cast<cpr::ErrorCode>(c)) {
+        case cpr::ErrorCode::CONNECTION_FAILURE:
+            return "connection failure";
+        case cpr::ErrorCode::EMPTY_RESPONSE:
+            return "empty response";
+        case cpr::ErrorCode::HOST_RESOLUTION_FAILURE:
+            return "host resolution failure";
+        case cpr::ErrorCode::INTERNAL_ERROR:
+            return "internal error";
+        case cpr::ErrorCode::INVALID_URL_FORMAT:
+            return "invalid url format";
+        case cpr::ErrorCode::NETWORK_RECEIVE_ERROR:
+            return "network receive error";
+        case cpr::ErrorCode::NETWORK_SEND_FAILURE:
+            return "network send failure";
+        case cpr::ErrorCode::OPERATION_TIMEDOUT:
+            return "operation timeout";
+        case cpr::ErrorCode::PROXY_RESOLUTION_FAILURE:
+            return "proxy resolution failure";
+        case cpr::ErrorCode::SSL_CONNECT_ERROR:
+            return "ssl connect error";
+        case cpr::ErrorCode::SSL_LOCAL_CERTIFICATE_ERROR:
+            return "ssl local certificate error";
+        case cpr::ErrorCode::SSL_REMOTE_CERTIFICATE_ERROR:
+            return "ssl remote certificate error";
+        case cpr::ErrorCode::SSL_CACERT_ERROR:
+            return "ssl cacert error";
+        case cpr::ErrorCode::GENERIC_SSL_ERROR:
+            return "generic ssl error";
+        case cpr::ErrorCode::UNSUPPORTED_PROTOCOL:
+            return "unsupported protocol";
+        case cpr::ErrorCode::UNKNOWN_ERROR:
+        default:
+            return "unknown error";
+    }
+}
+
+std::error_condition ErrorCode_category::default_error_condition(int c) const noexcept {
+    switch (static_cast<cpr::ErrorCode>(c)) {
+        case cpr::ErrorCode::CONNECTION_FAILURE:
+            return std::errc::not_connected;
+        case cpr::ErrorCode::EMPTY_RESPONSE:
+            return std::errc::no_message;
+        case cpr::ErrorCode::HOST_RESOLUTION_FAILURE:
+            return std::errc::bad_address;
+        case cpr::ErrorCode::INTERNAL_ERROR:
+            return std::errc::state_not_recoverable;
+        case cpr::ErrorCode::INVALID_URL_FORMAT:
+            return std::errc::bad_address;
+        case cpr::ErrorCode::NETWORK_RECEIVE_ERROR:
+            return std::errc::bad_message;
+        case cpr::ErrorCode::NETWORK_SEND_FAILURE:
+            return std::errc::bad_message;
+        case cpr::ErrorCode::OPERATION_TIMEDOUT:
+            return std::errc::timed_out;
+        case cpr::ErrorCode::PROXY_RESOLUTION_FAILURE:
+            return std::errc::bad_address;
+        case cpr::ErrorCode::SSL_CONNECT_ERROR:
+            return std::errc::not_connected;
+        case cpr::ErrorCode::SSL_LOCAL_CERTIFICATE_ERROR:
+            return std::errc::invalid_argument;
+        case cpr::ErrorCode::SSL_REMOTE_CERTIFICATE_ERROR:
+            return std::errc::invalid_argument;
+        case cpr::ErrorCode::SSL_CACERT_ERROR:
+            return std::errc::invalid_argument;
+        case cpr::ErrorCode::GENERIC_SSL_ERROR:
+            return std::errc::invalid_argument;
+        case cpr::ErrorCode::UNSUPPORTED_PROTOCOL:
+            return std::errc::protocol_not_supported;
+        case cpr::ErrorCode::UNKNOWN_ERROR:
+        default:
+            return std::errc::state_not_recoverable;
+    }
+}
+} // namespace detail
